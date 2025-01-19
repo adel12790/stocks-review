@@ -21,12 +21,12 @@ namespace api.Repository
         
         public async Task<List<Stock>> GetAllAsync()
         {
-            return await _context.Stocks.ToListAsync();
+            return await _context.Stocks.Include(c => c.Comments).ToListAsync();
         }
 
         public async Task<Stock?> GetById(int id)
         {
-            return await _context.Stocks.FindAsync(id);
+            return await _context.Stocks.Include(c => c.Comments).FirstOrDefaultAsync(i => i.Id == id);
         }
 
         public async Task<Stock> CreateAsync(Stock stockModel)
@@ -65,6 +65,11 @@ namespace api.Repository
             await _context.SaveChangesAsync();
 
             return stockModel;
+        }
+
+        public async Task<bool> StockExists(int id)
+        {
+            return await _context.Stocks.AnyAsync(x => x.Id == id);
         }
     }
 }
