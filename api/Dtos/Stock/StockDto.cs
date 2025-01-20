@@ -17,7 +17,7 @@ namespace api.Dtos.Stock
 
         public String Industry { get; set; } = String.Empty;
         public long MarketCap { get; set; }
-        public List<CommentDto> Comments { get; set; }
+        public required List<CommentDto> Comments { get; set; }
 
     }
 }

@@ -28,6 +28,8 @@ namespace api.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+
             var comments = await _commentRepo.GetAllAsync();
             var commentsDto = comments.Select(x => x.toCommentDto());
             return Ok(commentsDto);
@@ -36,6 +38,8 @@ namespace api.Controllers
         [HttpGet("{id:int}")]
         public async Task<IActionResult> GetById([FromRoute] int id)
         {
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+
             var commentModel = await _commentRepo.GetByIdAsync(id);
 
             if (commentModel == null) return NotFound();
@@ -46,6 +50,8 @@ namespace api.Controllers
         [HttpPost("{stockId:int}")]
         public async Task<IActionResult> Create([FromRoute] int stockId, [FromBody] CreateCommentRequestDto commentDto)
         {
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+
             bool stockExists = await _stockRepo.StockExists(stockId);
 
             if (!stockExists) return BadRequest("Stock Doesn't exist");
@@ -59,6 +65,8 @@ namespace api.Controllers
         [HttpPut("{id:int}")]
         public async Task<IActionResult> Update([FromRoute] int id, [FromBody] UpdateCommentRequestDto commentDto)
         {
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+
             var commentModel = await _commentRepo.UpdateAsync(id, commentDto.toCommentFromUpdateDto());
 
             if (commentModel == null) NotFound();
@@ -69,6 +77,8 @@ namespace api.Controllers
         [HttpDelete("{id:int}")]
         public async Task<IActionResult> Delete([FromRoute] int id)
         {
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+
             var commentModel = await _commentRepo.DeleteAsync(id);
 
             if (commentModel == null) return NotFound();
