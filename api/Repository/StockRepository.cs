@@ -19,26 +19,32 @@ namespace api.Repository
         {
             _context = context;
         }
-        
+
         public async Task<List<Stock>> GetAllAsync(QueryObject query)
         {
             var stocks = _context.Stocks.Include(c => c.Comments).AsQueryable();
 
-            if(!string.IsNullOrWhiteSpace(query.CompanyName)){
+            if (!string.IsNullOrWhiteSpace(query.CompanyName))
+            {
                 stocks = stocks.Where(x => x.CompanyName.Contains(query.CompanyName));
             }
 
-            if(!string.IsNullOrWhiteSpace(query.Symbol)){
+            if (!string.IsNullOrWhiteSpace(query.Symbol))
+            {
                 stocks = stocks.Where(x => x.Symbol.Contains(query.Symbol));
             }
 
-            if(!string.IsNullOrWhiteSpace(query.SortBy)){
-                if(query.SortBy.Equals("Symbol", StringComparison.OrdinalIgnoreCase)){
+            if (!string.IsNullOrWhiteSpace(query.SortBy))
+            {
+                if (query.SortBy.Equals("Symbol", StringComparison.OrdinalIgnoreCase))
+                {
                     stocks = query.IsDecending ? stocks.OrderByDescending(s => s.Symbol) : stocks.OrderBy(s => s.Symbol);
                 }
             }
 
-            return await stocks.ToListAsync();
+            var skipNumber = (query.PageNumber - 1) * query.PageSize;
+
+            return await stocks.Skip(skipNumber).Take(query.PageSize).ToListAsync();
         }
 
         public async Task<Stock?> GetById(int id)
@@ -58,8 +64,8 @@ namespace api.Repository
         {
             var stockModel = await _context.Stocks.FirstOrDefaultAsync(x => x.Id == id);
 
-            if(stockModel == null) return null;
-    
+            if (stockModel == null) return null;
+
             stockModel.Symbol = updateDto.Symbol;
             stockModel.CompanyName = updateDto.CompanyName;
             stockModel.Purchase = updateDto.Purchase;
